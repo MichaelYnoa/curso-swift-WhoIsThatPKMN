@@ -10,25 +10,26 @@ import UIKit
 class PokemonViewController: UIViewController {
 
     @IBOutlet weak var pokemonImage: UIImageView!
-    
     @IBOutlet weak var labelScore: UILabel!
-    
     @IBOutlet weak var labelMessage: UILabel!
-    
     @IBOutlet var answerButtons: [UIButton]!
+    
+    lazy var pokemonManager = PokemonManager()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         
         createButtons()
+        pokemonManager.fetchPokemon()
         
     }
     
     
     @IBAction func buttonPressed(_ sender: UIButton) {
         
-        sender.title(for: .normal)!
+        print(sender.title(for: .normal)!)
         
         
         
@@ -48,4 +49,15 @@ class PokemonViewController: UIViewController {
     
 }
 
+extension PokemonViewController: PokemonManagerDelegate {
+    func didUpdatePokemon(pokemons: [PokemonModel]) {
+        print(pokemons)
+    }
+    
+    func didFailWithError(error: Error) {
+        print(error)
+    }
+    
+    
+}
 
