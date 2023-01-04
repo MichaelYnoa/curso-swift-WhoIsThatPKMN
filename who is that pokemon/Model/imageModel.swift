@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+
+struct ImageModel {
+    let imageUR: String
+    
+}
