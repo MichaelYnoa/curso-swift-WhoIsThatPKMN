@@ -68,6 +68,8 @@ class PokemonViewController: UIViewController {
             
             
         }else{
+            /*
+            
             labelMessage.text = "NOOO, es un \(correctAnswer.capitalized)"
             sender.layer.borderColor = UIColor.systemRed.cgColor
             sender.layer.borderWidth = 5
@@ -79,9 +81,21 @@ class PokemonViewController: UIViewController {
                 self.resetGame()
                 sender.layer.borderWidth = 0
             }
+            */
+            self.performSegue(withIdentifier: "goToResult", sender: self)
             
         }
         
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "goToResult" {
+            let destination = segue.destination as! ResultViewController
+            destination.pokemonName = correctAnswer
+            destination.pokemonImageURL = correctAnswerImage
+            destination.finalScore = game.score
+            resetGame()
+        }
     }
     
     func resetGame() {
