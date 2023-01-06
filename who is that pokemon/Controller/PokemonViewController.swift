@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class PokemonViewController: UIViewController {
     
@@ -18,8 +19,13 @@ class PokemonViewController: UIViewController {
     
     lazy var pokemonManager = PokemonManager()
     lazy var imageManager = ImageManager()
+    lazy var game = GameModel()
     
-    var random4Pokemons: [PokemonModel] = []
+    var random4Pokemons: [PokemonModel] = [] {
+        didSet {
+            setButtonTitles()
+        }
+    }
     var correctAnswer: String = ""
     var correctAnswerImage: String = ""
     
@@ -28,26 +34,61 @@ class PokemonViewController: UIViewController {
     
     
     override func viewDidLoad() {
-        
-        
-        
         super.viewDidLoad()
         pokemonManager.delegate = self
         imageManager.delegate = self
         
-        
         createButtons()
         pokemonManager.fetchPokemon()
+        labelMessage.text = " "
         
     }
     
     
     @IBAction func buttonPressed(_ sender: UIButton) {
         
-        print(sender.title(for: .normal)!)
+        let userAnswer = sender.title(for: .normal)!
         
+        if game.checkAnswer(userAnswer, correctAnswer){
+            labelMessage.text = "Si, es un \(userAnswer.capitalized)"
+            labelScore.text = "Puntaje: \(game.score)"
+            
+            sender.layer.borderColor = UIColor.systemGreen.cgColor
+            sender.layer.borderWidth = 5
+            
+            let url = URL(string: correctAnswerImage)
+            pokemonImage.kf.setImage(with: url)
+            
+            
+            Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { timer in
+                self.pokemonManager.fetchPokemon()
+                self.labelMessage.text = " "
+                sender.layer.borderWidth = 0
+            }
+            
+            
+        }else{
+            labelMessage.text = "NOOO, es un \(correctAnswer.capitalized)"
+            sender.layer.borderColor = UIColor.systemRed.cgColor
+            sender.layer.borderWidth = 5
+            let url = URL(string: correctAnswerImage)
+            pokemonImage.kf.setImage(with: url)
+            
+            
+            Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { timer in
+                self.resetGame()
+                sender.layer.borderWidth = 0
+            }
+            
+        }
         
-        
+    }
+    
+    func resetGame() {
+        self.pokemonManager.fetchPokemon()
+        game.setScore(score: 0)
+        labelScore.text = "Puntaje: \(game.score)"
+        self.labelMessage.text = " "
     }
     
     func createButtons() {
@@ -59,6 +100,14 @@ class PokemonViewController: UIViewController {
             button.layer.masksToBounds = false
             button.layer.cornerRadius = 10.0
             
+        }
+    }
+    
+    func setButtonTitles() {
+        for (index, button) in answerButtons.enumerated() {
+            DispatchQueue.main.async { [self] in
+                button.setTitle(random4Pokemons[safe: index]?.name.capitalized, for: .normal)
+            }
         }
     }
     
@@ -85,7 +134,22 @@ extension PokemonViewController: PokemonManagerDelegate {
 extension PokemonViewController: ImageManagerDelegate{
     
     func didUpdateImage(image: ImageModel) {
-        print(image.imageUR)
+        correctAnswerImage = image.imageUR
+        
+        DispatchQueue.main.async { [self] in
+            let url = URL(string: image.imageUR)
+            
+            let effect = ColorControlsProcessor(brightness: -1, contrast: 1, saturation: 1, inputEV: 0)
+            
+            pokemonImage.kf.setImage(
+                with: url,
+                options: [
+                    .processor(effect)
+                ]
+            )
+            
+            
+        }
     }
 
     func didFailWithErrorImage(error: Error) {
