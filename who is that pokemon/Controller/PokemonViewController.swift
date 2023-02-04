@@ -42,6 +42,7 @@ class PokemonViewController: UIViewController {
         pokemonManager.fetchPokemon()
         labelMessage.text = " "
         
+        
     }
     
     
@@ -68,7 +69,7 @@ class PokemonViewController: UIViewController {
             
             
         }else{
-            /*
+            
             
             labelMessage.text = "NOOO, es un \(correctAnswer.capitalized)"
             sender.layer.borderColor = UIColor.systemRed.cgColor
@@ -77,12 +78,17 @@ class PokemonViewController: UIViewController {
             pokemonImage.kf.setImage(with: url)
             
             
-            Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { timer in
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
                 self.resetGame()
                 sender.layer.borderWidth = 0
             }
-            */
-            self.performSegue(withIdentifier: "goToResult", sender: self)
+            
+            
+            // aqui reiniciare el juego para ya que no he podido conectar la segunda pantalla
+            //self.dismiss(animated: true)
+            
+            
+            //self.performSegue(withIdentifier: "goToResult", sender: self)
             
         }
         
@@ -114,6 +120,7 @@ class PokemonViewController: UIViewController {
             button.layer.masksToBounds = false
             button.layer.cornerRadius = 10.0
             
+            
         }
     }
     
@@ -134,7 +141,7 @@ extension PokemonViewController: PokemonManagerDelegate {
         let index = Int.random(in: 0...3)
         let imageData = random4Pokemons[index].imageURL
         correctAnswer = random4Pokemons[index].name
-        
+        print(correctAnswer) //eliminar esta linea luego de terminar, solo para fines de prueba
         imageManager.fetchImage(url: imageData)
     }
     
